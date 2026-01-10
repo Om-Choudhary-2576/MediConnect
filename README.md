@@ -3,7 +3,7 @@
 MediCaps EduBot ek intelligent platform hai jo MediCaps University ke students ke liye banaya gaya hai. Yeh AI ki madad se padhai ko aasaan aur smart banata hai.
 
 ## 🚀 Live MVP Link
-[Yahan apna GitHub Pages wala link paste karein](https://aapka-username.github.io/medicaps-edubot/)
+https://om-choudhary-2576.github.io/MediConnect/
 
 ## ✨ Key Features
 - **AI Study Hub:** PDF notes ko summarize karein aur instant quizzes banayein.
@@ -25,7 +25,7 @@ MediCaps EduBot ek intelligent platform hai jo MediCaps University ke students k
 This project is built using a lightweight architecture (CDN-based), meaning it requires **zero installation** or complex setup to run.
 
 ### 1. Instant Preview (Recommended)
-Simply click on our live **[MVP Demo Link](https://aapka-username.github.io/medicaps-edubot/)** to explore the platform directly in your browser.
+Simply click on our live (https://om-choudhary-2576.github.io/MediConnect/) to explore the platform directly in your browser.
 
 ### 2. Local Execution
 If you wish to run the project on your local machine:
