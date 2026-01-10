@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediCaps EduBot | Intelligent Learning</title>
+
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Fira+Code:wght@400;500&display=swap');
+
+        /* Common Styles */
+        body { font-family: 'Inter', sans-serif; margin: 0; background-color: #000; transition: background-color 0.5s ease; }
+        .hidden { display: none !important; }
+
+        /* Landing Page Specific */
+        .text-gradient {
+            background: linear-gradient(to right, #6366f1, #a855f7, #ec4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Dashboard Specific Styles */
+        .sidebar-item:hover { background-color: #eff6ff; color: #2563eb; }
+        .active-tab { background-color: #eff6ff; color: #2563eb !important; border-right: 4px solid #2563eb; }
+        .custom-card { background: white; border-radius: 24px; padding: 25px; box-shadow: 0 4px 10px rgba(0,0,0,0.03); border: 1px solid #e5e7eb; }
+        .ai-header-bg { background: linear-gradient(to right, #2c3e50, #4b6cb7); color: white; padding: 40px 20px; text-align: center; border-radius: 0 0 20px 20px; }
+        .status-box { width: 24px; height: 24px; border: 2px solid #d1d5db; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .status-box.checked { background-color: #10b981; border-color: #10b981; }
+        .study-hub-card { background: white; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); margin-top: -30px; padding: 30px; }
+    </style>
+</head>
+<body>
+
+    <div id="landing-page" class="text-white min-h-screen flex flex-col animate-in fade-in duration-700">
+        <nav class="flex justify-between items-center px-6 md:px-12 py-8">
+            <div class="flex items-center space-x-3 bg-zinc-900/50 border border-zinc-800 p-2 pr-4 rounded-2xl">
+                <div class="bg-indigo-600 p-1.5 rounded-lg">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                </div>
+                <span class="font-black tracking-tighter text-xl italic uppercase">MEDICAPS</span>
+            </div>
+            <button onclick="enterApp()" class="bg-white text-black px-8 py-2.5 rounded-full font-bold text-xs tracking-widest hover:scale-105 transition-all shadow-xl shadow-white/10">
+                ACCESS PORTAL
+            </button>
+        </nav>
+
+        <main class="flex-grow flex flex-col items-center justify-center text-center px-6">
+            <div class="mb-4 text-[10px] tracking-[0.4em] text-indigo-400 font-bold uppercase">Global Academic Initiative</div>
+            <h1 class="text-6xl md:text-9xl font-black leading-none tracking-tighter mb-6">
+                INTELLIGENT<br><span class="text-gradient">LEARNING.</span>
+            </h1>
+            <p class="max-w-xl text-zinc-400 text-lg md:text-xl font-medium leading-relaxed italic opacity-80 mb-10">
+                "MediCaps EduBot is a student-centric learning platform designed to make studying easier, smarter, and faster."
+            </p>
+            <div class="flex flex-col md:flex-row gap-5">
+                <button onclick="enterApp()" class="bg-indigo-600 px-12 py-4 rounded-full font-bold text-xs tracking-[0.2em] hover:bg-indigo-500 shadow-[0_0_25px_rgba(79,70,229,0.3)] transition-all">
+                    JOIN US
+                </button>
+                <button class="border border-zinc-800 bg-zinc-900/30 px-12 py-4 rounded-full font-bold text-xs tracking-[0.2em] hover:bg-zinc-800 transition-all">
+                    THE ARCHITECTURE
+                </button>
+            </div>
+        </main>
+    </div>
+
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        // Transition Function
+        window.enterApp = () => {
+            document.getElementById('landing-page').classList.add('hidden');
+            document.getElementById('root').classList.remove('hidden');
+            document.body.style.backgroundColor = "#f3f4f6"; // Light background for dashboard
+            window.scrollTo(0,0);
+        };
+
+        const Icon = ({ name, size = 20, color = "currentColor", fill = "none" }) => {
+            useEffect(() => { if (window.lucide) window.lucide.createIcons(); }, [name, size, color]);
+            return <i data-lucide={name} style={{ width: size, height: size, stroke: color, fill: fill }}></i>;
+        };
+
+        const MedicapsLogo = () => (
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'white', borderRadius: '12px', padding: '8px', boxShadow: '0 4px 10px rgba(0,0,0,0.1)' }}>
+                <svg width="32" height="32" viewBox="0 0 100 100">
+                    <rect width="100" height="100" rx="20" fill="#3b82f6"/>
+                    <path d="M50 20L80 35V65L50 80L20 65V35L50 20Z" fill="white" fillOpacity="0.2"/>
+                    <path d="M50 30L70 40V60L50 70L30 60V40L50 30Z" fill="white"/>
+                </svg>
+            </div>
+        );
+
+        function App() {
+            const [activeTab, setActiveTab] = useState('academic');
+            const [userInput, setUserInput] = useState("");
+            const [aiResult, setAiResult] = useState("");
+            const [loading, setLoading] = useState(false);
+            const [chatWith, setChatWith] = useState(null);
+            const [isHindi, setIsHindi] = useState(false);
+
+            const [goals, setGoals] = useState(() => {
+                const saved = localStorage.getItem("mediconnect_tasks_v2");
+                return saved ? JSON.parse(saved) : [{ id: 1, subject: "Data Structures", time: "10:30 AM", done: false }];
+            });
+
+            useEffect(() => { localStorage.setItem("mediconnect_tasks_v2", JSON.stringify(goals)); }, [goals]);
+
+            const [newSub, setNewSub] = useState("");
+            const [h, setH] = useState("10");
+            const [m, setM] = useState("00");
+            const [ap, setAp] = useState("AM");
+
+            const addTask = (e) => {
+                e.preventDefault();
+                if (!newSub) return;
+                setGoals([...goals, { id: Date.now(), subject: newSub, time: `${h}:${m} ${ap}`, done: false }]);
+                setNewSub("");
+            };
+
+            const syncToCalendar = (task) => {
+                const [time, period] = task.time.split(' ');
+                let [hours, minutes] = time.split(':');
+                if (period === "PM" && hours !== "12") hours = parseInt(hours) + 12;
+                if (period === "AM" && hours === "12") hours = "00";
+                const now = new Date();
+                const startTime = `${now.getFullYear()}${(now.getMonth()+1).toString().padStart(2,'0')}${now.getDate().toString().padStart(2,'0')}T${hours.toString().padStart(2,'0')}${minutes}00`;
+                const calendarUrl = `https://www.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent("Study: " + task.subject)}&dates=${startTime}/${startTime}&details=MediConnect_Sync&sf=true&output=xml`;
+                window.open(calendarUrl, '_blank');
+            };
+
+            // FIXED: Using FormData as requested
+            const handleAIAction = (taskType) => {
+                if (!userInput.trim()) {
+                    alert("Please enter some text first");
+                    return;
+                }
+
+                setLoading(true);
+                setAiResult("MediConnect AI is thinking...");
+
+                const formData = new FormData();
+                formData.append("task", taskType);
+                formData.append("text", userInput);
+
+                // Add PDF if one is selected in the file input
+                const pdfFile = document.getElementById('pdf-upload')?.files[0];
+                if (pdfFile) formData.append("pdf", pdfFile);
+
+                fetch("http://103.192.199.80:5000/ask", {
+                    method: "POST",
+                    // No Content-Type header needed for FormData
+                    body: formData
+                })
+                .then(res => res.json())
+                .then(data => {
+                    setAiResult(data.reply || "No response from AI");
+                    setLoading(false);
+                })
+                .catch(err => {
+                    console.error(err);
+                    setAiResult("❌ AI connection failed");
+                    setLoading(false);
+                });
+            };
+
+            return (
+                <div className="flex min-h-screen">
+                    <aside className="w-[280px] bg-white border-r border-gray-200 p-[30px_20px] fixed h-screen z-50">
+                        <div className="flex items-center gap-3 mb-10">
+                            <MedicapsLogo />
+                            <h2 className="text-xl font-extrabold">MediConnect</h2>
+                        </div>
+                        <nav className="space-y-2">
+                            {[
+                                { id: 'academic', label: 'AI Study Hub', icon: 'zap' },
+                                { id: 'sync', label: 'Exam Planner', icon: 'calendar' },
+                                { id: 'mentorship', label: 'Peer Mentoring', icon: 'heart-handshake' },
+                                { id: 'campus', label: 'Campus Live', icon: 'monitor' },
+                                { id: 'outreach', label: 'Outreach', icon: 'users' }
+                            ].map((item) => (
+                                <div key={item.id} onClick={() => {setActiveTab(item.id); setChatWith(null);}}
+                                    className={`sidebar-item flex items-center gap-3 p-3 rounded-xl cursor-pointer font-semibold transition-all ${activeTab === item.id ? 'active-tab' : 'text-gray-500'}`}>
+                                    <Icon name={item.icon} color={activeTab === item.id ? "#2563eb" : "#4b5563"} />
+                                    {item.label}
+                                </div>
+                            ))}
+                        </nav>
+                        {/* Home Button to return to landing page */}
+                        <div className="absolute bottom-10 left-0 w-full px-5">
+                            <button onClick={() => window.location.reload()} className="w-full flex items-center justify-center gap-2 p-3 text-gray-400 hover:text-red-500 font-bold text-sm">
+                                <Icon name="log-out" size={16} /> Exit Portal
+                            </button>
+                        </div>
+                    </aside>
+
+                    <main className="ml-[280px] flex-1 min-h-screen bg-gray-50">
+                        {activeTab === 'academic' && (
+                            <div className="animate-in fade-in duration-500">
+                                <div className="ai-header-bg">
+                                    <h1 className="text-3xl font-bold flex items-center justify-center gap-3">🎓 Medicaps EduBot</h1>
+                                    <p className="opacity-80 mt-1">AI-Powered Academic Assistant</p>
+                                </div>
+                                <div className="max-w-4xl mx-auto px-6 pb-20">
+                                    <div className="study-hub-card space-y-6">
+                                        <div>
+                                            <h3 className="font-bold text-gray-700 mb-3">📘 Upload PDF (Notes / Timetable)</h3>
+                                            <div className="border-2 border-dashed border-gray-200 p-5 rounded-xl bg-gray-50">
+                                                <input type="file" id="pdf-upload" accept="application/pdf" className="text-sm" />
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <h3 className="font-bold text-gray-700 mb-3">✍️ Paste Text</h3>
+                                            <textarea className="w-full h-40 p-4 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500" placeholder="Paste notes or syllabus text here...." value={userInput} onChange={(e)=>setUserInput(e.target.value)}></textarea>
+                                        </div>
+                                        <div className="grid grid-cols-3 gap-4">
+                                            <button onClick={()=>handleAIAction('summary')} className="py-3 bg-blue-500 text-white rounded-lg font-bold">📄 Summarize</button>
+                                            <button onClick={()=>handleAIAction('quiz')} className="py-3 bg-emerald-500 text-white rounded-lg font-bold">❓ Generate Quiz</button>
+                                            <button onClick={()=>handleAIAction('plan')} className="py-3 bg-amber-500 text-white rounded-lg font-bold">📅 Study Plann</button>
+                                        </div>
+                                        <div className="p-5 bg-blue-50 border-l-4 border-blue-500 rounded-r-lg min-h-[100px] whitespace-pre-wrap">
+                                            {loading ? <span className="animate-pulse text-blue-600 font-bold">Generating...</span> : aiResult || "AI response will appear here after you click an action button."}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                       {/* 2. EXAM PLANNER (Persistent + Sync) */}
+                        {activeTab === 'sync' && (
+                            <div className="p-10 max-w-4xl space-y-6 animate-in fade-in">
+                                <div className="grid grid-cols-2 gap-6 mb-10 text-white font-bold">
+                                    <div className="bg-gradient-to-br from-blue-600 to-blue-800 p-8 rounded-[24px] shadow-lg"><p className="text-xs opacity-70 uppercase">MST COUNTDOWN</p><h2 className="text-4xl mt-2 font-black">05 Days</h2></div>
+                                    <div className="bg-white p-8 rounded-[24px] border border-gray-200 text-gray-800"><p className="text-gray-400 text-xs uppercase">End Sem COUNTDOWN</p><h2 className="text-4xl mt-2 font-black">45 Days</h2></div>
+                                </div>
+                                <div className="custom-card">
+                                    <form onSubmit={addTask} className="flex gap-4 items-center">
+                                        <input className="flex-1 bg-gray-50 border p-3 rounded-xl font-bold text-sm outline-none" placeholder="Subject" value={newSub} onChange={e => setNewSub(e.target.value)} />
+                                        <div className="flex gap-1 bg-gray-50 border p-2 rounded-xl">
+                                            <select className="bg-transparent font-bold" value={h} onChange={e=>setH(e.target.value)}>{[1,2,3,4,5,6,7,8,9,10,11,12].map(x=><option key={x} value={x}>{x}</option>)}</select>
+                                            <select className="bg-transparent font-bold" value={m} onChange={e=>setM(e.target.value)}>{['00','15','30','45'].map(x=><option key={x} value={x}>{x}</option>)}</select>
+                                            <select className="bg-transparent font-bold text-blue-600" value={ap} onChange={e=>setAp(e.target.value)}><option value="AM">AM</option><option value="PM">PM</option></select>
+                                        </div>
+                                        <button type="submit" className="bg-gray-900 text-white px-6 py-3 rounded-xl font-bold">Add Task</button>
+                                    </form>
+                                </div>
+                                <div className="custom-card overflow-hidden">
+                                    <table className="w-full text-left">
+                                        <thead><tr className="border-b border-gray-100 text-gray-400 text-[10px] font-black uppercase tracking-widest"><th className="pb-4 px-2">Subject</th><th className="pb-4 px-2">Time</th><th className="pb-4 text-center">Status</th><th className="pb-4 text-center">Sync</th><th className="pb-4 text-right px-2">Action</th></tr></thead>
+                                        <tbody>
+                                            {goals.map(g => (
+                                                <tr key={g.id} className="border-b border-gray-50">
+                                                    <td className={`py-4 px-2 font-bold ${g.done ? 'line-through text-gray-300' : 'text-gray-700'}`}>{g.subject}</td>
+                                                    <td className={`py-4 px-2 font-bold ${g.done ? 'text-gray-300' : 'text-blue-600'}`}>{g.time}</td>
+                                                    <td className="py-4 flex justify-center"><div onClick={() => setGoals(goals.map(x => x.id === g.id ? {...x, done: !x.done} : x))} className={`status-box mx-auto ${g.done ? 'checked' : ''}`}>{g.done && <Icon name="check" size={14} color="white" />}</div></td>
+                                                    <td className="py-4 text-center"><button onClick={() => syncToCalendar(g)} className="text-blue-500 hover:text-blue-700"><Icon name="calendar-days" /></button></td>
+                                                    <td className="py-4 px-2 text-right"><button onClick={() => setGoals(goals.filter(x => x.id !== g.id))}><Icon name="trash-2" color="#ef4444" size={18} /></button></td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        )}
+
+                      	{activeTab === 'mentorship' && (
+    <div className="w-full">
+        {/* Screenshot ki tarah Heading yahan add ki hai */}
+        <h2 className="text-3xl font-bold text-gray-900 mb-8 px-2">Peer Mentorship</h2>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[
+                { name: "Ishaan Sharma", expert: "Data Structures", year: "4th Year", rate: "4.9" },
+                { name: "Priya Verma", expert: "AI/ML & Python", year: "3rd Year", rate: "4.7" },
+                { name: "Rahul Mehta", expert: "Web Dev (MERN)", year: "4th Year", rate: "4.8" },
+                { name: "Sneha Kapoor", expert: "Java & OOPs", year: "3rd Year", rate: "4.6" },
+                { name: "Aryan Singh", expert: "Cyber Security", year: "4th Year", rate: "4.9" },
+                { name: "Ananya Iyer", expert: "Cloud Computing", year: "4th Year", rate: "4.5" }
+            ].map((m, i) => (
+                /* Card ko 'relative' banaya hai taaki rating position ho sake */
+                <div key={i} className="custom-card relative flex flex-col items-center text-center hover:translate-y-[-5px] transition-transform shadow-sm p-6 bg-white rounded-3xl border border-gray-100">
+                    
+                    {/* Rating Badge - Har mentor ki alag dikhegi */}
+                    <div className="absolute top-5 right-5 flex items-center gap-1 bg-amber-50 text-amber-600 px-3 py-1 rounded-full text-xs font-bold">
+                        <Icon name="star" size={12} fill="#d97706" color="#d97706" /> 
+                        {m.rate}
+                    </div>
+
+                    {/* Profile Icon Section */}
+                    <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center text-blue-600 font-bold text-xl mb-4"> 
+                        <Icon name="users" size={24} /> 
+                    </div>
+
+                    {/* Mentor Info */}
+                    <h3 className="font-extrabold text-lg text-gray-800">{m.name}</h3>
+                    <p className="text-blue-600 font-bold text-sm mb-1">{m.expert}</p>
+                    <p className="text-gray-400 text-xs mb-6 uppercase tracking-wider font-semibold">{m.year}</p>
+                    
+                    {/* Button */}
+                    <button 
+                        onClick={() => setChatWith(m.name)} 
+                        className="w-full py-3 bg-gray-900 text-white rounded-xl font-bold text-sm hover:bg-black transition-all"
+                    >
+                        Connect & Chat
+                    </button>
+                </div>
+            ))}
+        </div>
+    </div>
+)}
+						
+						 {/* 4. CAMPUS LIVE */}
+                        {activeTab === 'campus' && (
+                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                                <div className="custom-card shadow-sm h-fit">
+                                    <h3 className="text-xl font-bold mb-6 border-b pb-4 flex items-center gap-2 font-bold"><Icon name="monitor" /> Live Labs & Availability</h3>
+                                    <div className="space-y-4">
+                                        {[
+                                            {l:"Central Library", s:"92% Full", a:"Mr. Ramesh Jain", c:"text-red-500", cap: "12 Seats"},
+                                            {l:"AI & ML Lab", s:"Available", a:"Ms. Sunita Rao", c:"text-green-500", cap: "25 Seats"},
+                                            {l:"Electronics Lab", s:"Busy", a:"Mr. Anil Verma", c:"text-amber-500", cap: "15 Seats"},
+                                            {l:"CS Lab 2", s:"Available", a:"Mr. Vijay S.", c:"text-green-500", cap: "18 Seats"},
+                                            {l:"Physics Lab", s:"Closed", a:"Mr. Sanjay Pal", c:"text-red-500", cap: "0 Seats"}
+                                        ].map((item, i) => (
+                                            <div key={i} className="p-4 bg-gray-50 rounded-2xl border flex flex-col gap-3 transition-all hover:bg-white shadow-sm">
+                                                <div className="flex justify-between items-center"><span className="font-extrabold text-gray-800 text-lg block">{item.l}</span><span className={`font-black ${item.c}`}>{item.s}</span></div>
+                                                <div className="flex justify-between items-center border-t pt-3">
+                                                    <div><p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest">Asst: <span className="text-blue-700">{item.cap}</span></p><p className="font-extrabold text-gray-700 text-md leading-none">{item.a}</p></div>
+                                                    <button onClick={() => setChatWith(item.a)} className="bg-gray-900 text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-blue-600 transition-all flex items-center gap-2"><Icon name="message-circle" size={14} /> Connect</button>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                                <div className="custom-card shadow-sm h-fit">
+                                    <h3 className="text-xl font-bold mb-6 border-b pb-4 flex items-center gap-2 font-bold"><Icon name="user-check" /> Faculty Directory</h3>
+                                    <div className="space-y-4">
+                                        {[
+                                            {n:"Dr. Aditi Jain", s:"Physics", c:"A-102", inc: true},
+                                            {n:"Dr. Pramod Nair", s:"Data Structures", c:"V-305", inc: true},
+											 {n:"Dr. Hariom Patidar", s:"Digital Electronics", c:"V-333", inc: false},
+											  {n:"Dr. Gourav Sharma", s:"Operating System", c:"V-332", inc: true},
+											   {n:"Dr. Shrikant Patel", s:"Java Programming", c:"B-305", inc: true},
+                                            {n:"Prof. Archana Dubey", s:"Maths I", c:"M-204", inc: false}
+                                        ].map((f, i) => (
+                                            <div key={i} className="p-4 bg-gray-50 rounded-2xl border transition-all hover:bg-white shadow-sm">
+                                                <div className="flex justify-between items-center mb-3">
+                                                    <div className="flex items-center gap-2 font-bold"><div className={`w-3 h-3 rounded-full ${f.inc ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]' : 'bg-red-500'}`}></div><span className="font-extrabold text-lg text-gray-800">{f.n}</span></div>
+                                                    <span className="bg-blue-50 text-blue-600 px-3 py-1 rounded-lg text-xs font-black">Cabin {f.c}</span>
+                                                </div>
+                                                <div className="flex justify-between items-center">
+                                                    <div><p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{f.s} Dept</p><p className={`text-sm font-bold ${f.inc ? 'text-green-600' : 'text-red-600'}`}>{f.inc ? "Available In Cabin" : "Not In Cabin"}</p></div>
+                                                    <button onClick={() => setChatWith(f.n)} className="bg-blue-600 text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-gray-900 transition-all flex items-center gap-2 font-bold uppercase"><Icon name="send" size={14} /> Connect</button>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+						
+						
+						
+                                         {/* 5. OUTREACH (MAP + COMMUNITY CHAT) */}
+{activeTab === 'outreach' && (
+    <div className="space-y-8 animate-in fade-in duration-500 pb-20">
+        {/* Leaderboard Design */}
+        <div className="bg-gradient-to-br from-indigo-900 via-blue-900 to-slate-900 p-8 rounded-[32px] border border-blue-400/20 shadow-2xl relative overflow-hidden">
+            <div className="absolute top-0 right-0 p-10 opacity-10 rotate-12"><Icon name="trophy" size={120} color="white" /></div>
+            <div className="flex justify-between items-center mb-8 relative z-10">
+                <div><h3 className="text-2xl font-black text-white flex items-center gap-3 font-bold">Social Impact Leaders</h3><p className="text-blue-300 text-xs font-bold uppercase tracking-widest">Global Ranking • Medi-Caps Cell</p></div>
+                <button onClick={() => setIsHindi(!isHindi)} className="bg-white/10 backdrop-blur-md border border-white/20 px-6 py-2 rounded-2xl text-xs font-bold text-white hover:bg-white/20 transition-all flex items-center gap-2"><Icon name="languages" size={14} /> {isHindi ? "Hindi" : "English"}</button>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative z-10 text-center">
+                {[
+                    {n: "Rahul S.", p: "1250 impact", r: "Gold", c: "text-amber-400", bg: "bg-amber-400/10", b: "border-amber-400/30"},
+                    {n: "Sneha K.", p: "980 impact", r: "Silver", c: "text-slate-300", bg: "bg-slate-300/10", b: "border-slate-300/30"},
+                    {n: "Amit V.", p: "750 impact", r: "Bronze", c: "text-orange-400", bg: "bg-orange-400/10", b: "border-orange-400/30"}
+                ].map((u, i) => (
+                    <div key={i} className={`rank-card p-6 rounded-[24px] border ${u.b} ${u.bg} backdrop-blur-sm text-center`}>
+                        <div className="mb-2 flex justify-center"><Icon name="medal" color={u.c.replace('text-', '#')} fill={u.c.replace('text-', '#')} size={32} /></div>
+                        <p className="text-white font-black text-lg font-bold">{u.n}</p><p className={`${u.c} font-bold text-sm uppercase font-bold`}>{u.r} Tier • {u.p} pts</p>
+                    </div>
+                ))}
+            </div>
+        </div>
+
+        {/* Tasks Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {[
+                { e: "Village Computer Literacy", h: "गाँव साक्षरता", p: "+250 impact ", i: "monitor" },
+                { e: "Old Clothes Donation Drive", h: "पुराने कपड़े दान", p: "+150 impact ", i: "hand-heart" },
+                { e: "Weekend School Teaching", h: "सप्ताह स्कूल शिक्षण", p: "+300 impact ", i: "school" },
+                { e: "Blood Donation Camp", h: "रक्तदान शिविर", p: "+500 impact", i: "heart" }
+            ].map((t, i) => (
+                <div key={i} className="bg-white p-6 rounded-[28px] border border-gray-100 flex justify-between items-center shadow-sm hover:border-blue-200 transition-all group font-bold">
+                    <div className="flex items-center gap-4">
+                        <div className="p-4 bg-slate-50 text-blue-600 rounded-2xl"><Icon name={t.i} /></div>
+                        <div><h4 className="font-extrabold text-gray-800 text-sm leading-tight font-bold">{isHindi ? t.h : t.e}</h4><span className="text-green-600 font-black text-[10px] uppercase tracking-tighter font-bold">{t.p} Points</span></div>
+                    </div>
+                    <button onClick={() => setChatWith("Outreach Team")} className="bg-gray-900 text-white p-3 rounded-xl hover:bg-black transition-colors shadow-lg flex items-center gap-2 font-bold text-xs tracking-tighter uppercase"><Icon name="message-circle" size={16} /> Connect</button>
+                </div>
+            ))}
+        </div>
+
+        {/* MAP & COMMUNITY CHAT SECTION */}
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 mt-4">
+            {/* Map Container (Takes 2/3 space on large screens) */}
+            <div className="xl:col-span-2">
+                <div className="custom-card shadow-lg p-0 overflow-hidden bg-white rounded-[32px] border border-gray-100 h-full flex flex-col">
+                    <div className="p-6 bg-white border-b flex justify-between items-center">
+                        <div className="flex items-center gap-3">
+                            <Icon name="map-pin" color="#ef4444" />
+                            <span className="font-extrabold text-gray-800 text-lg">Impact Locations</span>
+                        </div>
+                        <span className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">Indore Region</span>
+                    </div>
+                    <div className="w-full h-[400px]">
+                        <iframe 
+                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d117763.673859664!2d75.78363403264477!3d22.72391173264639!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3962fcad1b4496bb%3A0x6d9539d09c3132d!2sIndore%2C%20Madhya%20Pradesh!5e0!3m2!1sen!2sin!4v1700000000000!5m2!1sen!2sin" 
+                            width="100%" 
+                            height="100%" 
+                            style={{ border: 0, display: 'block' }} 
+                            allowFullScreen="" 
+                            loading="lazy"
+                            referrerPolicy="no-referrer-when-downgrade"
+                        ></iframe>
+                    </div>
+                </div>
+            </div>
+
+            {/* Community Chat Box (Takes 1/3 space) */}
+            <div className="xl:col-span-1">
+                <div className="custom-card shadow-lg p-0 overflow-hidden bg-white rounded-[32px] border border-gray-100 h-[485px] flex flex-col">
+                    <div className="p-5 bg-blue-600 text-white flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                            <Icon name="message-square" size={20} />
+                            <span className="font-bold">Community Hub</span>
+                        </div>
+                        <span className="bg-green-400 w-2 h-2 rounded-full animate-pulse"></span>
+                    </div>
+                    
+                    {/* Chat Messages */}
+                    <div className="flex-1 p-4 overflow-y-auto bg-gray-50 space-y-4">
+                        <div className="flex flex-col items-start">
+                            <span className="text-[10px] font-bold text-gray-400 ml-2 mb-1">LOCAL RESIDENT</span>
+                            <div className="bg-white p-3 rounded-2xl rounded-tl-none border shadow-sm text-sm text-gray-700 max-w-[85%]">
+                                Hello! Are there any blood donation camps this week?
+                            </div>
+                        </div>
+                        
+                        <div className="flex flex-col items-end">
+                            <span className="text-[10px] font-bold text-blue-500 mr-2 mb-1">STUDENT VOLUNTEER</span>
+                            <div className="bg-blue-600 p-3 rounded-2xl rounded-tr-none shadow-md text-sm text-white max-w-[85%]">
+                                Yes, we have one scheduled this Saturday at the Main Gate!
+                            </div>
+                        </div>
+
+                        <div className="flex flex-col items-start">
+                            <span className="text-[10px] font-bold text-gray-400 ml-2 mb-1">ANONYMOUS</span>
+                            <div className="bg-white p-3 rounded-2xl rounded-tl-none border shadow-sm text-sm text-gray-700 max-w-[85%]">
+                                I want to donate some old books. Where should I come?
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Chat Input */}
+                    <div className="p-4 bg-white border-t flex gap-2">
+                        <input 
+                            className="flex-1 bg-gray-100 rounded-xl px-4 py-2 text-sm outline-none border border-transparent focus:border-blue-300" 
+                            placeholder="Ask the community..." 
+                        />
+                        <button className="bg-blue-600 text-white p-2 rounded-xl hover:bg-blue-700 transition-colors">
+                            <Icon name="send" size={18} />
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+)}
+				
+                    </main>
+
+                    {chatWith && (
+                        <div className="fixed bottom-10 right-10 w-80 bg-white shadow-2xl rounded-[32px] border border-gray-200 overflow-hidden z-[100] animate-in slide-in-from-right">
+                            <div className="bg-gray-900 text-white p-5 flex justify-between items-center font-bold">
+                                <span>Chat: {chatWith}</span>
+                                <button onClick={()=>setChatWith(null)}>✕</button>
+                            </div>
+                            <div className="h-64 p-6 bg-gray-50 text-gray-500 text-sm italic">Connecting...</div>
+                            <div className="p-4 border-t flex gap-2">
+                                <input className="flex-1 bg-gray-100 rounded-xl p-3 text-xs outline-none" placeholder="Type message..." />
+                                <button className="bg-blue-600 text-white p-3 rounded-xl"><Icon name="send" size={16} /></button>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
