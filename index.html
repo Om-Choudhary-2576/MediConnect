@@ -215,36 +215,40 @@
 
                 const API_URL = "http://103.192.199.80:5000/ask";
 
-                // DATA PRIVACY WARNING: We are using a public proxy to bypass Mixed Content restrictions on GitHub Pages.
-                // In a real production app, the backend should be secured with SSL (HTTPS).
+                // DATA PRIVACY WARNING: We are using a public proxy to bypass Mixed Content restrictions.
                 const isHttps = window.location.protocol === 'https:';
 
-                // Using corsproxy.io to bridge HTTPS frontend -> HTTP backend
+                // ATTEMPT 2: Using thingproxy.freeboard.io which handles headers/ports slightly differently
+                // Note: Proxies are flaky. Ideally, deploy backend on HTTPS.
                 const finalEndpoint = isHttps
-                    ? `https://corsproxy.io/?${encodeURIComponent(API_URL)}`
+                    ? `https://thingproxy.freeboard.io/fetch/${API_URL}`
                     : API_URL;
+
+                console.log("Attempting fetch to:", finalEndpoint);
 
                 fetch(finalEndpoint, {
                     method: "POST",
-                    // No Content-Type header needed for FormData
                     body: formData
                 })
-                    .then(res => res.json())
+                    .then(async res => {
+                        if (!res.ok) {
+                            const txt = await res.text();
+                            throw new Error(`Server Error: ${res.status} ${res.statusText} - ${txt}`);
+                        }
+                        return res.json();
+                    })
                     .then(data => {
-                        setAiResult(data.reply || "No response from AI");
+                        console.log("AI Response:", data);
+                        setAiResult(data.reply || "No response text.");
                         setLoading(false);
                     })
                     .catch(err => {
-                        console.error(err);
-                        let errorMsg = "❌ AI connection failed.";
+                        console.error("Fetch Error:", err);
 
-                        if (isHttps) {
-                            errorMsg += " Use the Proxy or disable Shield in browser.";
-                        } else {
-                            errorMsg += " Make sure the backend is running.";
-                        }
+                        let contextMsg = isHttps ? " (Proxy Mode)" : " (Direct Mode)";
+                        let technicalDetails = err.message || err.toString();
 
-                        setAiResult(errorMsg + " Please go on 103.192.199.80:5173 in your browser as a backup.");
+                        setAiResult(`❌ Connection Failed${contextMsg}\n\nError: ${technicalDetails}\n\nTroubleshooting:\n1. Backend (103.192...) might be down.\n2. Proxy might be blocked.\n3. Try disabling 'Shield' in browser URL bar.\n4. Use http://103.192.199.80:5173 directly.`);
                         setLoading(false);
                     });
             };
