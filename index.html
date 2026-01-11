@@ -245,10 +245,36 @@
                     .catch(err => {
                         console.error("Fetch Error:", err);
 
-                        let contextMsg = isHttps ? " (Proxy Mode)" : " (Direct Mode)";
-                        let technicalDetails = err.message || err.toString();
-
-                        setAiResult(`❌ Connection Failed${contextMsg}\n\nError: ${technicalDetails}\n\nTroubleshooting:\n1. Backend (103.192...) might be down.\n2. Proxy might be blocked.\n3. Try disabling 'Shield' in browser URL bar.\n4. Use http://103.192.199.80:5173 directly.`);
+                        // Fallback logic enabled by a State check in the UI would be better, but for this single-file setup:
+                        // We will allow the user to click a button to retry directly.
+                        if (isHttps && finalEndpoint.includes("proxy")) {
+                            setAiResult(
+                                <div className="p-2">
+                                    <p className="font-bold text-red-500 mb-2">❌ Proxy Connection Failed</p>
+                                    <p className="text-xs text-gray-600 mb-4">{err.message}</p>
+                                    <button
+                                        onClick={() => {
+                                            // FORCE DIRECT FETCH (Bypassing Proxy)
+                                            setLoading(true);
+                                            setAiResult("Attempting direct connection... Check your URL bar for a 'Shield' icon to allow this.");
+                                            fetch(API_URL, { method: "POST", body: formData })
+                                                .then(r => r.json())
+                                                .then(d => { setAiResult(d.reply); setLoading(false); })
+                                                .catch(e => {
+                                                    setAiResult("❌ Blocked by Browser Security. Please click the 'Shield' icon in your address bar and 'Load Unsafe Scripts' to allow access to the backend.");
+                                                    setLoading(false);
+                                                });
+                                        }}
+                                        className="bg-red-100 text-red-600 px-4 py-2 rounded-lg font-bold text-xs hover:bg-red-200 transition-colors"
+                                    >
+                                        ⚠️ Retry with Direct Connection (Unsecure)
+                                    </button>
+                                </div>
+                            );
+                        } else {
+                            let technicalDetails = err.message || err.toString();
+                            setAiResult(`❌ Connection Failed\n\nError: ${technicalDetails}\n\nTroubleshooting:\n1. Backend (103.192...) might be down.\n2. Try disabling 'Shield' in browser URL bar.`);
+                        }
                         setLoading(false);
                     });
             };
